@@ -18,18 +18,30 @@
 
                         $.get('/logins', function(data2) {
                             data2 = JSON.parse(data2);
+                            
+                            $.get('/images', function(data3) {
+	                            data3 = JSON.parse(data3);
 
-                            $('.result').text('');
-                            for(var i=0; i<data2.length; i++) {
-                                $('<div class="entry-important"></div>').text(data2[i]).appendTo($('.result.right'));
-                            }
-                            for(var i=0; i<data1.length; i++) {
-                                if (isPorn(data1[i])) {
-                                    $('<div class="entry-porn"></div>').text(data1[i]).appendTo($('.result.left'));
-                                } else {
-                                    $('<div class="entry"></div>').text(data1[i]).appendTo($('.result.left'));
-                                }
-                            }
+		                        $('.result').text('');
+		                        for(var i=0; i<data2.length; i++) {
+		                            $('<div class="entry-important"></div>').text(data2[i]).appendTo($('.result.right'));
+		                        }
+		                        for(var i=0; i<data1.length; i++) {
+		                            if (isPorn(data1[i])) {
+		                                $('<div class="entry-porn"></div>').text(data1[i]).appendTo($('.result.left'));
+		                            } else {
+		                                $('<div class="entry"></div>').text(data1[i]).appendTo($('.result.left'));
+		                            }
+		                        }
+		                        $('.images').text('');
+		                        for(var i=data3.length-1; i>=0; i--) {
+		                        	if (isPorn(data3[i])) continue; // no porn on TV
+		                        	if(data3[i].search('ad') >= 0) continue; // adblock!
+		                            $('<img>').attr('src', data3[i]).appendTo($('.images'));
+		                            $('<br>').appendTo($('.images'));
+		                            $('<br>').appendTo($('.images'));
+		                        }
+		                    });
                         });
                     });
                 }, 1000);
@@ -50,11 +62,21 @@
                 float: left;
                 box-sizing: border-box;
             }
+            .images {
+            	position: fixed;
+            	bottom: 0;
+            	right: 0;
+            	text-align: right;
+            }
+            img {
+            	max-width: 25%;
+            }
         </style>
     </head>
 
     <body>
         <div class="result left"></div>
         <div class="result right"></div>
+        <div class="images"></div>
     </body>
 </html>

