@@ -19,15 +19,15 @@
                         $.get('/logins', function(data2) {
                             data2 = JSON.parse(data2);
 
-                            $('#result').text('');
+                            $('.result').text('');
                             for(var i=0; i<data2.length; i++) {
-                                $('<div class="entry-important"></div>').text(data2[i]).appendTo($('#result'));
+                                $('<div class="entry-important"></div>').text(data2[i]).appendTo($('.result.right'));
                             }
                             for(var i=0; i<data1.length; i++) {
                                 if (isPorn(data1[i])) {
-                                    $('<div class="entry-porn"></div>').text(data1[i]).appendTo($('#result'));
+                                    $('<div class="entry-porn"></div>').text(data1[i]).appendTo($('.result.left'));
                                 } else {
-                                    $('<div class="entry"></div>').text(data1[i]).appendTo($('#result'));
+                                    $('<div class="entry"></div>').text(data1[i]).appendTo($('.result.left'));
                                 }
                             }
                         });
@@ -41,16 +41,20 @@
             }
             .entry-porn {
                 font-weight: bold;
-                color: pink;
+                color: red;
             }
-            #result {
+            .result {
                 padding: 100px 20px 20px 20px;
                 font-family: monospace;
+                width: 50%;
+                float: left;
+                box-sizing: border-box;
             }
         </style>
     </head>
 
     <body>
-        <div id="result"></div>
+        <div class="result left"></div>
+        <div class="result right"></div>
     </body>
 </html>

@@ -79,6 +79,8 @@ def pkt_callback(pkt):
 
                    if len(urls) > 100: 
                        urls = urls[:100]
+                   if len(logins) > 100: 
+                       logins = logins[:100]
                    print "80 tcp", urls, logins
 
 
