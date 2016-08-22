@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <script src="jquery.js"></script>
+        <script>
+            $(document).ready(function() {
+                setInterval(function() {
+                    function isPorn(str) {
+                        return (
+                            (str.search('redtube') >= 0) ||
+                            (str.search('tube8') >= 0) ||
+                            (str.search('hentai') >= 0) ||
+                            (str.search('ecchi') >= 0) ||
+                            (str.search('xxx') >= 0) ||
+                            (str.search('porn') >= 0));
+                    }
+                    $.get('/urls', function(data1) {
+                        data1 = JSON.parse(data1);
+
+                        $.get('/logins', function(data2) {
+                            data2 = JSON.parse(data2);
+
+                            $('#result').text('');
+                            for(var i=0; i<data2.length; i++) {
+                                $('<div class="entry-important"></div>').text(data2[i]).appendTo($('#result'));
+                            }
+                            for(var i=0; i<data1.length; i++) {
+                                if (isPorn(data1[i])) {
+                                    $('<div class="entry-porn"></div>').text(data1[i]).appendTo($('#result'));
+                                } else {
+                                    $('<div class="entry"></div>').text(data1[i]).appendTo($('#result'));
+                                }
+                            }
+                        });
+                    });
+                }, 1000);
+            });
+        </script>
+        <style>
+            .entry-important {
+                font-weight: bold;
+            }
+            .entry-porn {
+                font-weight: bold;
+                color: pink;
+            }
+            #result {
+                padding: 100px 20px 20px 20px;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="result"></div>
+    </body>
+</html>
