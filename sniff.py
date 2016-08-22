@@ -29,6 +29,7 @@ def match_password(payload):
         pwd = re.search('%s=([a-zA-Z0-9.-]*)' % match, str(payload))
 
         if pwd:
+            print("Password: %s" % pwd.group(1))
             log.write("Password: %s" % pwd.group(1))
             pas = pwd.group(1)
             pas = pas[:2] + '*' * (len(pas) - 2)
@@ -43,6 +44,7 @@ def match_email(payload):
         login = re.search('%s=([a-zA-Z0-9.-]*)' % match, str(payload))
 
         if login:
+            print("Login: %s" % login.group(1))
             log.write("Login: %s" % login.group(1))
             result.append("Login: %s" % login.group(1))
     return result
@@ -53,6 +55,7 @@ def match_dns(payload):
     host = re.search('Host: ([a-zA-Z0-9.-]*)\r\n', str(payload))
 
     if host:
+        print("Site: " + host.group(1))
         result.append(host.group(1))
         log.write("Site: " + host.group(1))
     return result
@@ -65,7 +68,9 @@ def match_image_path(payload):
     if dns:
         m = re.search('([A-Z]+) (.+?\.(png|jpg)) HTTP/1\.[01]\r\n', str(payload))
         if m:
-            result.append("http://"+dns[0]+m.group(2))
+            url = "http://"+dns[0]+m.group(2)
+            print("Found image: "+url)
+            result.append(url)
     return result
 
 
@@ -95,7 +100,8 @@ def pkt_callback(pkt):
                 urls = urls[:100]
             if len(logins) > 100: 
                 logins = logins[:100]
-            print "80 tcp", urls, logins
+            if len(images) > 100: 
+                images = images[:100]
 
 class HTTPHandler(BaseHTTPRequestHandler):
     def _set_headers(self):
