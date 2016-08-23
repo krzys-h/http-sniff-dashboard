@@ -122,7 +122,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
         elif self.path == '/logins':
            self.wfile.write(json.dumps(list(reversed(sorted(list(set(logins)))))))
         elif self.path == '/images':
-           self.wfile.write(json.dumps(list(reversed(sorted(list(set(images)))))))
+           self.wfile.write(json.dumps(images))
         else:
            print "error", self.path
 
